@@ -2,10 +2,14 @@ package main
 
 import (
 	"fmt"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"log"
 	"log/slog"
 	"os"
-	config "url-shortener/internal"
+	"url-shortener/internal/config"
+	"url-shortener/internal/lib/logger/sl"
+	"url-shortener/internal/storage/sqlite"
 )
 
 const (
@@ -15,32 +19,33 @@ const (
 )
 
 func main() {
-	if err := run(); err != nil {
-		log.Fatal(err)
-	}
-}
-
-func run() error {
 
 	cfg, err := config.MustLoad()
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 
 	logger, err := setupLogger(cfg.Env)
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 	logger.Info("starting url-shortener", slog.String("env", cfg.Env))
 	logger.Debug("debug messages are enabled")
 
-	//TODO: storage
+	storage, err := sqlite.New(cfg.StoragePath)
+	if err != nil {
+		logger.Error("failed to init storage", sl.Err(err))
+		os.Exit(1)
+	}
+	logger.Debug("storage initialized")
 
-	//TODO: router
+	router := chi.NewRouter()
+
+	router.Use(middleware.RequestID)
+	router.Use(middleware.Logger)
 
 	//TODO: start server
 
-	return nil
 }
 
 func setupLogger(env string) (*slog.Logger, error) {
