@@ -11,7 +11,7 @@ func TestNewRandomString(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
+		{"test", args{size: 6}, "xxxxx"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
