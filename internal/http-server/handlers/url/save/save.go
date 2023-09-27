@@ -17,7 +17,7 @@ import (
 const aliasLength = 6 //TODO: move to config
 
 type Request struct {
-	URL   string `json:"url" validate:"required, url"`
+	URL   string `json:"url" validate:"required,url"`
 	Alias string `json:"alias,omitempty"`
 }
 
@@ -26,6 +26,7 @@ type Response struct {
 	Alias string `json:"alias,omitempty"`
 }
 
+// go:generate go run github.com/vektra/mockery/v2@v2.28.2 --name=URLSavergo:generate
 type URLSaver interface {
 	SaveUrl(alias string, urlToStore string) error
 }
@@ -61,6 +62,7 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 			validateErr := err.(validator.ValidationErrors)
 			log.Error("invalid request", sl.Err(err))
 			render.JSON(w, r, resp.ValidationError(validateErr))
+			//render.JSON(w, r, "internal server error")
 			return
 		}
 
