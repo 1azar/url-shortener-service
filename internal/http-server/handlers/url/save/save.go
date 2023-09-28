@@ -14,7 +14,7 @@ import (
 	"url-shortener/internal/storage"
 )
 
-const aliasLength = 6 //TODO: move to config
+const aliasLength = -1 //TODO: move to config
 
 type Request struct {
 	URL   string `json:"url" validate:"required,url"`
